@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookings Page</title>
+</head>
+<body>
+<h1>Your Bookings</h1>
+
+{% for booking in bookings %}
+    <p>
+        Room {{ booking.location.number }} at {{ booking.location.location }} <br>
+        From: {{ booking.start_time|date:"M d, Y H:i" }} <br>
+        To: {{ booking.end_time|date:"M d, Y H:i" }}
+    </p>
+{% empty %}
+    <p>You have no bookings.</p>
+{% endfor %}
+<br>
+<p><a href="{% url 'home' %}">Back to Home</a></p>
+<br>
+<button onclick="window.location.reload();">Refresh</button>
+</body>
+</html>
