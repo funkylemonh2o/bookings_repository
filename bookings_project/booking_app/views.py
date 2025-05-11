@@ -45,3 +45,6 @@ def book_details(request, number):
 def bookings(request):
     user_bookings = Booking.objects.filter(user=request.user)
     return render(request, 'bookings.html', {'bookings': user_bookings})
+
+def logged_out(request):
+    return render(request, 'logged_out.html')
