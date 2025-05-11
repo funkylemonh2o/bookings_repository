@@ -17,7 +17,7 @@ class Location(models.Model):
 
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings")
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="bookings")
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="locations")
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     creation_time = models.DateTimeField(auto_now_add=True)
