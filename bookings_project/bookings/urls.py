@@ -26,4 +26,5 @@ urlpatterns = [
     path('bookings', views.bookings, name='bookings'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('book/', views.book, name='book'),
+    path('book/<int:number>/', views.book_details, name='book_details'),
 ]

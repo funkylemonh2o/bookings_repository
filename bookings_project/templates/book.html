@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Book a Room</title>
-</head>
-<body>
 <h1>Available Rooms</h1>
 
 {% for loc in locations %}
@@ -12,14 +5,8 @@
         <h3>Room {{ loc.number }} at {{ loc.location }}</h3>
         <p>Capacity: {{ loc.capacity }}</p>
 
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="location_id" value="{{ loc.id }}">
-            
+        <form method="GET" action="{% url 'book_details' loc.number %}">
             <button type="submit">Book this Room</button>
         </form>
     </div>
 {% endfor %}
-
-</body>
-</html>

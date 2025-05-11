@@ -10,10 +10,27 @@ def home(request):
 def book(request):
     if request.method == 'POST':
         location_id = request.POST.get('location_id')
-        start = request.POST.get('start_time')
-        end = request.POST.get('end_time')
+
 
         location = get_object_or_404(Location, id=location_id)
+
+        Booking.objects.create(
+            user=request.user,
+            location=location,
+
+        )
+        return redirect('book')
+
+    locations = Location.objects.all()
+    return render(request, 'book.html', {'locations': locations})
+
+@login_required
+def book_details(request, number):
+    location = get_object_or_404(Location, number=number)
+
+    if request.method == 'POST':
+        start = request.POST.get('start_time')
+        end = request.POST.get('end_time')
 
         Booking.objects.create(
             user=request.user,
@@ -21,12 +38,9 @@ def book(request):
             start_time=start,
             end_time=end
         )
-        return redirect('book')
+        return redirect('bookings')  # Adjust if your bookings URL is named differently
 
-    locations = Location.objects.all()
-    return render(request, 'book.html', {'locations': locations})
-
-
+    return render(request, 'book_details.html', {'location': location})
 @login_required
 def bookings(request):
     user_bookings = Booking.objects.filter(user=request.user)
