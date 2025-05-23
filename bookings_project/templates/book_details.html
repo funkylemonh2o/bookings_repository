@@ -1,5 +1,13 @@
 <h2>Booking for Room {{ location.number }} at {{ location.location }}</h2>
 
+<!-- Feedback messages -->
+{% if messages %}
+  {% for message in messages %}
+    <div style="color: red;">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<!-- Booking form -->
 <form method="POST">
     {% csrf_token %}
     <label>Start Time:</label>
@@ -10,3 +18,5 @@
 
     <button type="submit">Confirm Booking</button>
 </form>
+<a href="{% url 'book' %}" style="color: red;">cancel</a>
+

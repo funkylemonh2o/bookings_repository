@@ -12,12 +12,13 @@
         <p><strong>From:</strong> {{ booking.start_time }}</p>
         <p><strong>To:</strong> {{ booking.end_time }}</p>
 
-        <form method="POST" style="margin-top: 10px;">
+        <form method="post" action="{% url 'delete_booking' booking.id %}" style="margin-top: 10px;">
             {% csrf_token %}
-            <input type="hidden" name="booking_id" value="{{ booking.id }}">
             <label>Confirm password to delete:</label>
             <input type="password" name="password" required>
             <button type="submit">Delete</button>
         </form>
     </div>
 {% endfor %}
+
+<a href="{% url 'home' %}">Go to home</a>

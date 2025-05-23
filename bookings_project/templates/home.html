@@ -1,28 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Booking Home{% endblock %}
 
 {% block content %}
-<h1>Welcome to the booking system</h1>
-<!-- your page content -->
-{% endblock %}
-
-
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Booking Home</title>
-</head>
-<body>
     <h1>Welcome to the Booking System</h1>
 
     {% if user.is_authenticated %}
         <p>Hello, {{ user.username }}!</p>
         <p><a href="{% url 'bookings' %}">View Your Bookings</a></p>
-        <p><a href="{% url 'logout' %}">Logout</a></p>
+        <a href="{% url 'book' %}">Book a place</a>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
     {% else %}
         <p><a href="{% url 'login' %}">Login</a> or <a href="{% url 'admin:index' %}">Go to Admin</a></p>
     {% endif %}
-</body>
-</html>
+{% endblock %}
