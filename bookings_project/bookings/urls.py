@@ -39,4 +39,11 @@ urlpatterns = [
         name='logout'
     ),
     path('bookings/delete/<int:booking_id>/', views.delete_booking, name='delete_booking'),
+    path('feedback', views.feedback, name='feedback'),
+    path('register/', views.register, name='register'),
+    path(
+        "confirmation/<int:booking_id>/<str:token>/",
+        views.confirm_booking,
+        name="confirmation"
+    ),
 ]

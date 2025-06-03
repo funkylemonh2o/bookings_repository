@@ -1,19 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}Booking Home{% endblock %}
-
 {% block content %}
-    <h1>Welcome to the Booking System</h1>
+<div class="container mt-5 text-center">
+    <h1 class="mb-4">Welcome to the Booking System</h1>
 
     {% if user.is_authenticated %}
         <p>Hello, {{ user.username }}!</p>
-        <p><a href="{% url 'bookings' %}">View Your Bookings</a></p>
-        <a href="{% url 'book' %}">Book a place</a>
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a href="{% url 'bookings' %}" class="btn btn-primary btn-lg">View Your Bookings</a>
+            <a href="{% url 'book' %}" class="btn btn-success btn-lg">Book a Place</a>
+            <a href="{% url 'feedback' %}" class="btn btn-warning btn-lg">Leave Feedback</a>
+            <a href="{% url 'login' %}" class="btn btn-danger btn-lg">Logout</a>
+        </div>
     {% else %}
-        <p><a href="{% url 'login' %}">Login</a> or <a href="{% url 'admin:index' %}">Go to Admin</a></p>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg">Register</a>
+        </div>
     {% endif %}
+</div>
 {% endblock %}

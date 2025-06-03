@@ -1,0 +1,43 @@
+<form method="POST">
+    {% csrf_token %}
+
+    <label for="room">Select a room:</label>
+    <select id="room" name="room" required>
+        {% for r in rooms %}
+            <option value="{{ r.id }}">Room {{ r.number }} - {{ r.location }}</option>
+        {% endfor %}
+    </select>
+
+    <div id="ratingSection" style="margin-top: 10px;">
+        <label for="rating">Rate (1-5):</label>
+        <input type="number" name="rating" id="rating" min="1" max="5" value="5">
+    </div>
+
+    <div id="commentSection" style="margin-top: 10px;">
+        <label for="comment">Comment:</label><br>
+        <textarea name="comment" id="comment" rows="4" cols="40"></textarea>
+    </div>
+
+    <button type="submit">Submit Feedback</button>
+</form>
+
+<script>
+// Optional: JS to disable comment box and rating input if user had no booking
+document.getElementById('room').addEventListener('change', function () {
+    fetch(`/check-booking/${this.value}/`)
+        .then(res => res.json())
+        .then(data => {
+            const commentBox = document.getElementById('comment');
+            const ratingInput = document.getElementById('rating');
+            if (!data.has_booking) {
+                commentBox.value = '';
+                commentBox.disabled = true;
+                ratingInput.value = 5;
+                ratingInput.disabled = true;
+            } else {
+                commentBox.disabled = false;
+                ratingInput.disabled = false;
+            }
+        });
+});
+</script>
