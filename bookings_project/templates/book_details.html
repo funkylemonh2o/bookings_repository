@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Booking for Room {{ location.number }} at {{ location.location }}</h2>
 
 <!-- Feedback messages -->
@@ -20,3 +24,5 @@
 </form>
 <a href="{% url 'book' %}" style="color: red;">cancel</a>
 
+
+{% endblock content %}

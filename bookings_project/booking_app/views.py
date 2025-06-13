@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Avg
 from django.http import HttpRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -13,31 +14,37 @@ from datetime import datetime
 from .forms import  RegisterForm
 from .models import Booking, Location, Feedback
 from django.core.mail import send_mail
-
+from email_validator import validate_email, EmailNotValidError
+from django.db import transaction
+from django.core.mail import send_mail, BadHeaderError
 from bookings.settings import EMAIL_HOST_USER
 
 
 # Create your views here.
 def home(request):
+    rooms = Location.objects.annotate(average_rating=Avg('feedback__rating'))
     return render(request, 'home.html')
+
+from django.db.models import Avg
 
 @login_required
 def book(request):
     if request.method == 'POST':
         location_id = request.POST.get('location_id')
-
-
         location = get_object_or_404(Location, id=location_id)
 
         Booking.objects.create(
             user=request.user,
             location=location,
-
         )
         return redirect('book')
 
-    locations = Location.objects.all()
+    # Annotate each location with its average feedback rating
+    locations = Location.objects.annotate(average_rating=Avg('feedback__rating'))
     return render(request, 'book.html', {'locations': locations})
+
+
+
 
 @login_required
 def book_details(request, number):
@@ -51,56 +58,65 @@ def book_details(request, number):
             messages.error(request, "Both start and end times are required.")
             return redirect('book_details', number=number)
 
-        start_time = timezone.make_aware(datetime.fromisoformat(start_time))
-        end_time = timezone.make_aware(datetime.fromisoformat(end_time))
+        try:
+            start_time = timezone.make_aware(datetime.fromisoformat(start_time))
+            end_time = timezone.make_aware(datetime.fromisoformat(end_time))
+        except ValueError:
+            messages.error(request, "Invalid date format.")
+            return redirect('book_details', number=number)
 
-        # ❗ Check for overlapping bookings
         conflicts = Booking.objects.filter(
             location=location,
             start_time__lt=end_time,
             end_time__gt=start_time
         )
-
         if conflicts.exists():
             messages.error(request, "This room is already booked in that time range.")
             return redirect('book_details', number=number)
 
-        # ✅ Create booking
-        booking = Booking.objects.create(
-            user=request.user,
-            location=location,
-            start_time=start_time,
-            end_time=end_time,
-        )
-
-        # ✅ Send email confirmation
-        subject = "Booking Confirmation"
-        message = f"""
-        Hi {request.user.username},
-
-        Your booking for {location.number} is confirmed.
-
-        📅 Start: {booking.start_time.strftime('%Y-%m-%d %H:%M')}
-        📅 End: {booking.end_time.strftime('%Y-%m-%d %H:%M')}
-
-        Thanks for booking with us!
-        """
-        email = request.user.email
+        email = validate_email(request.user.email)
         if not email:
-            messages.error(request, "Your account doesn't have an email address set.")
+            messages.error(request, "Your account doesn't have a valid email address.")
             return redirect('book_details', number=number)
 
-        send_mail(
-            subject,
-            message,
-            settings.EMAIL_HOST_USER,
-            [email],  # <-- now guaranteed not None
-            fail_silently=False,
-        )
-        messages.success(request, "Room booked successfully! Confirmation sent via email.")
-        return redirect('bookings')
+        subject = "Booking Confirmation"
+        message = f"""
+Hi {request.user.username},
+
+Your booking for room {location.number} is confirmed.
+
+Start: {start_time.strftime('%Y-%m-%d %H:%M')}
+End: {end_time.strftime('%Y-%m-%d %H:%M')}
+
+Thanks for booking with us!
+"""
+
+        try:
+            with transaction.atomic():  # 👈 Rollback-safe block
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+
+                # Booking only saved *after* email succeeds
+                Booking.objects.create(
+                    user=request.user,
+                    location=location,
+                    start_time=start_time,
+                    end_time=end_time,
+                )
+
+            messages.success(request, "Room booked successfully! Confirmation sent via email.")
+            return redirect('bookings')
+
+        except (BadHeaderError, Exception) as e:
+            messages.error(request, f"Booking failed: {str(e)}")
 
     return render(request, 'book_details.html', {'location': location})
+
 
 @login_required
 def bookings(request):

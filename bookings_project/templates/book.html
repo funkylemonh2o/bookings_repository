@@ -1,13 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
 <h1>Available Rooms</h1>
 
 {% for loc in locations %}
     <div style="margin-bottom: 20px;">
         <h3>Room {{ loc.number }} at {{ loc.location }}</h3>
         <p>Capacity: {{ loc.capacity }}</p>
-
+        <p>
+            Average Rating:
+            {% if loc.average_rating %}
+                {{ loc.average_rating|floatformat:1 }} ★
+            {% else %}
+                No ratings yet
+            {% endif %}
+        </p>
         <form method="GET" action="{% url 'book_details' loc.number %}">
             <button type="submit">Book this Room</button>
         </form>
     </div>
 {% endfor %}
+
 <a href="{% url 'home' %}">Go to home</a>
+{% endblock content %}

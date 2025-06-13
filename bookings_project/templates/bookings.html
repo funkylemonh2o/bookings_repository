@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
 <h1>Your Bookings</h1>
 
 {% if messages %}
@@ -18,7 +21,14 @@
             <input type="password" name="password" required>
             <button type="submit">Delete</button>
         </form>
+
+        {% if booking.location and booking.location.number %}
+        <form method="GET" action="{% url 'book_details' booking.location.number %}">
+            <button type="submit">Edit booking</button>
+        </form>
+        {% endif %}
     </div>
 {% endfor %}
 
 <a href="{% url 'home' %}">Go to home</a>
+{% endblock content %}
