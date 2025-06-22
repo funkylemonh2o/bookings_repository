@@ -1,25 +1,39 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Available Rooms</h1>
+<h1 class="mb-4 text-center">Available Rooms</h1>
 
-{% for loc in locations %}
-    <div style="margin-bottom: 20px;">
-        <h3>Room {{ loc.number }} at {{ loc.location }}</h3>
-        <p>Capacity: {{ loc.capacity }}</p>
-        <p>
-            Average Rating:
+<div class="row row-cols-1 row-cols-md-2 g-4">
+  {% for loc in locations %}
+    <div class="col">
+      <div class="card h-100 shadow-lg position-relative border-0">
+        <div class="card-body bg-dark text-white rounded">
+          <h5 class="card-title">Room {{ loc.number }} - {{ loc.location }}</h5>
+          <p><strong>Capacity:</strong> {{ loc.capacity }}</p>
+          <p>
+            <strong>Average Rating:</strong>
             {% if loc.average_rating %}
-                {{ loc.average_rating|floatformat:1 }} ★
+              <span>{{ loc.average_rating|floatformat:1 }}</span>
+              <span style="color: gold;">★</span>
             {% else %}
-                No ratings yet
+              <em>No ratings yet</em>
             {% endif %}
-        </p>
-        <form method="GET" action="{% url 'book_details' loc.number %}">
-            <button type="submit">Book this Room</button>
-        </form>
-    </div>
-{% endfor %}
+          </p>
+          <form method="GET" action="{% url 'book_details' loc.number %}">
+            <button type="submit" class="btn btn-primary mt-2 w-100">Book this Room</button>
+          </form>
+        </div>
 
-<a href="{% url 'home' %}">Go to home</a>
+        <!-- Decorative image in bottom-right corner -->
+        <img src="https://th.bing.com/th/id/R.17386ce78b905a6ebf8b5ec91fa27e11?rik=TuhlGYC96UUUbw&riu=http%3a%2f%2fwww.pixeljoint.com%2ffiles%2ficons%2ffull%2fpalmtree_pj.png&ehk=7ha2CvFN%2feaNX2tx748YYGow0SuqbJKHlptnQpMKvFA%3d&risl=&pid=ImgRaw&r=0"
+             alt="Room Icon"
+             style="position: absolute; bottom: 10px; right: 10px; width: 80px; height: 80px;">
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="mt-5 text-center">
+  <a href="{% url 'home' %}" class="btn btn-outline-secondary">Back to Home</a>
+</div>
 {% endblock content %}

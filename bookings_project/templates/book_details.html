@@ -1,28 +1,31 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Booking for Room {{ location.number }} at {{ location.location }}</h2>
 
-<h2>Booking for Room {{ location.number }} at {{ location.location }}</h2>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
 
-<!-- Feedback messages -->
-{% if messages %}
-  {% for message in messages %}
-    <div style="color: red;">{{ message }}</div>
-  {% endfor %}
-{% endif %}
+  <div class="card shadow p-4 bg-light">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="start_time" class="form-label">Start Time:</label>
+        <input type="datetime-local" id="start_time" name="start_time" class="form-control" required>
+      </div>
 
-<!-- Booking form -->
-<form method="POST">
-    {% csrf_token %}
-    <label>Start Time:</label>
-    <input type="datetime-local" name="start_time" required><br>
+      <div class="mb-3">
+        <label for="end_time" class="form-label">End Time:</label>
+        <input type="datetime-local" id="end_time" name="end_time" class="form-control" required>
+      </div>
 
-    <label>End Time:</label>
-    <input type="datetime-local" name="end_time" required><br><br>
-
-    <button type="submit">Confirm Booking</button>
-</form>
-<a href="{% url 'book' %}" style="color: red;">cancel</a>
-
-
+      <button type="submit" class="btn btn-success w-100">Confirm Booking</button>
+    </form>
+    <a href="{% url 'book' %}" class="btn btn-danger mt-3 w-100">Cancel</a>
+  </div>
+</div>
 {% endblock content %}
